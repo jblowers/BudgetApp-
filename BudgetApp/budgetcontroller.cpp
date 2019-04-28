@@ -1,25 +1,23 @@
 #include "budgetcontroller.h"
 
-BudgetController::BudgetController(QObject* parent)
+BudgetController::BudgetController(QObject* parent) :
+    QObject(parent),
+    m_budget(parent)
 {
-    m_budget.loadDefaultBudget();
 
+//    m_budget.loadDefaultBudget();
 
 }
 
-
-void BudgetController::setDateRange(QDate start, QDate end)
+BudgetController::~BudgetController()
 {
-//    Transaction trans;
+    //end
+}
 
-//    QDate it = start;
-//    while ( it < end ) {
-//        trans.setTitle(QString::number(it.day()));
-//        trans.setDescription(it.toString());
-//        trans.setDate(it);
-//        trans.setTransactionType(Transaction::Transaction_Unknown);
-//        m_TransMap.insert(trans.date(),trans);
-//        it = it.addDays(1);
-//    }
+
+void BudgetController::removeTransaction(QDate date,int nIndex)
+{
+    qDebug("Attempting to remove %s index %d",date.toString().toStdString().c_str(),nIndex);
+    m_budget.removeTransaction(date,nIndex);
 
 }

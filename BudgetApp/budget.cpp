@@ -1,35 +1,66 @@
 #include "budget.h"
 
 //Budget::Budget()
-Budget::Budget(QObject* parent)
+Budget::Budget(QObject* parent) : QObject(parent)
 {
 
     loadDefaultBudget();
 
 }
 
-Budget::Budget(QDate start, QDate end)
+
+//Budget::Budget(QDate start, QDate end)
+//{
+//    m_BudgetEndDate = end;
+//    m_BudgetStartDate = start;
+//    loadDefaultBudget();
+//}
+
+
+void Budget::addTransaction(Transaction trans, bool bCheckDuplicate)
 {
-    m_BudgetEndDate = end;
-    m_BudgetStartDate = start;
-    loadDefaultBudget();
+    if (bCheckDuplicate) {
+        // do logic to find if this transaction exists already or not
+    } else {
+        m_TransactionData.append(trans);
+    }
+    updateDateMap();
 }
 
+bool Budget::removeTransaction(Transaction* pTrans)
+{
+    qDebug("removeTransaction(pTrans)");
+    bool ret = true;
+    if(!pTrans) {
+        qDebug("Can't remove transaction, doesn't exist");
+        ret = false;
+    } else {
+         checkAndRemoveDataForTransaction(pTrans);
+    }
 
+    qDebug("return: %d", ret);
+    updateDateMap();
+    return ret;
+}
 
-//Day Budget::getDay(QDate date)
-//{
-//    return m_dayMap[date];
-//}
-
-//void Budget::addTransactionToDate(QDate date, Transaction trans)
-//{
-////    if(m_dayMap.contains(date)) {
-////        m_dayMap[date].addTransaction(trans);
-//////        m_dayMap.insert(date,trans);
-////    }
-//}
-int nInc = 0;
+bool Budget::checkAndRemoveDataForTransaction(Transaction* pTrans)
+{
+    if(!pTrans) {
+        return false;
+    }
+    else {
+        QMutableVectorIterator<Transaction> it(m_TransactionData);
+        while(it.hasNext()) {
+            Transaction* pT = &it.next();
+            if(pT == pTrans) {
+                qDebug("Removed transaction. %d =?= %d  %s",pT,pTrans,it.peekPrevious().title().toStdString().c_str());
+                it.remove(); // does this remove the current or the next?
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 void Budget::loadDefaultBudget()
 {
@@ -39,20 +70,21 @@ void Budget::loadDefaultBudget()
     int numTransactions = 3;
     for(QDate date = m_BudgetStartDate; date < m_BudgetEndDate; date = date.addDays(1))
     {
-        numTransactions = date.toJulianDay() % 10;
+        numTransactions = 4;//date.toJulianDay() % 10;
         qDebug("Date: %s\tnumTrans: %d\n",date.toString().toStdString().c_str(),numTransactions);
         for(int i = 0; i < numTransactions; i++) {
-            nInc++;
             Transaction trans;
-            trans.setTitle("JD: " + QString::number(date.toJulianDay()) + " it: " + QString::number(i));
-            trans.setDescription("Iteration: " + QString::number(nInc));
+            trans.setTitle("JD: " + QString::number(2458600-date.toJulianDay()) + " it: " + QString::number(i));
+            qDebug("%s",trans.title().toStdString().c_str());
+            trans.setDescription("Iteration: " + QString::number(i));
             trans.setDate(date);
             if ( date.toJulianDay()%2 == 0)
-                trans.setValue(nInc*numTransactions);
+                trans.setValue(i);
             else {
-                trans.setValue(-1*nInc*numTransactions);
+                trans.setValue(-i);
             }
-            m_TransactionData.append(trans);
+            addTransaction(trans);
+//            m_TransactionData.append(trans);
         }
     }
     updateDateMap();
@@ -76,7 +108,7 @@ void Budget::updateDateMap()
 
 
     // printing date map
-    if(1) {
+    if(0) {
         QDate date = m_BudgetStartDate.addDays(16);
         QVector<Transaction*> vec = m_DateMap[date];
         for(int i = 0; i < vec.length(); i++ ) {

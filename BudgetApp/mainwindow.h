@@ -25,13 +25,17 @@ public:
     QComboBox *m_pCombo;
     QListWidget *m_pList;
     void fillInTransactionData(Transaction* trans);
-    void populateComboBox(QVector<Transaction*> trans);
+    void populateTransactionList(QVector<Transaction*> trans);
+    void updateGuiData();
+    int m_nCurrentTransactionIndex;
 
     QVector<Transaction*> m_CurrentSelectionTransactions;
 
 public slots:
     void onSelectionChanged();
     void onSelectedTransIndexChanged(int);
+    void onRemoveSelectedPressed();
+    void onSaveTransactionPressed();
 
 private:
     Ui::MainWindow *ui;

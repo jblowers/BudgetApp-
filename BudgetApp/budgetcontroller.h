@@ -5,21 +5,32 @@
 #include <QMap>
 #include "budget.h"
 
-class BudgetController
+class BudgetController : public QObject
 {
+    Q_OBJECT
 public:
     BudgetController(QObject* parent = nullptr);
+    virtual ~BudgetController();
 
-//    QMap<QDate,Transaction> m_TransMap;
+signals:
+    void updateTransactionGui();
+
+public:
 
     Budget m_budget;
 
-    void setDateRange(QDate start,QDate end);
-
     QDate getStartDate() { return m_budget.getStartDate(); }
     QDate getEndDate() { return m_budget.getEndDate(); }
+    void removeTransaction(QDate date,int nIndex);
+    void removeTransaction(Transaction* pTrans) {
+        qDebug("removeTransaction(ptrans) %d",pTrans);
+        m_budget.removeTransaction(pTrans);
+        emit updateTransactionGui();
+    }
 
-    QVector<Transaction*> getTransaction(QDate date) { return m_budget.getTransactionsAtDate(date); }
+    void addTransaction(Transaction trans) { m_budget.addTransaction(trans); }
+    QVector<Transaction*> getTransactionVector(QDate date) { return m_budget.getTransactionsAtDate(date); }
+
 
 };
 
