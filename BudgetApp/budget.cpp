@@ -17,6 +17,26 @@ Budget::Budget(QObject* parent) : QObject(parent)
 //}
 
 
+bool Budget::SaveToJson(QJsonObject &json)
+{
+    json["budgetTitle"] = "Test Budget";
+    json["budgetDescription"] = "Test test 123Abc";
+    json["dateCreated"] = m_DateCreated.toString();
+    json["dateModified"] = m_DateModified.toString();
+    json["budgetStartDate"] = m_BudgetStartDate.toString();
+    json["budgetEndDate"] = m_BudgetEndDate.toString();
+    QJsonArray transArray;
+    foreach(Transaction trans,m_TransactionData)
+    {
+        QJsonObject transObj;
+        trans.SaveToJson(transObj);
+        transArray.append(transObj);
+    }
+    json["transactionDate"] = transArray;
+
+    return true;
+}
+
 void Budget::addTransaction(Transaction trans, bool bCheckDuplicate)
 {
     if (bCheckDuplicate) {
@@ -68,7 +88,7 @@ void Budget::loadDefaultBudget()
     m_BudgetEndDate = QDate::currentDate().addDays(100);
 
     int numTransactions = 3;
-    for(QDate date = m_BudgetStartDate; date < m_BudgetEndDate; date = date.addDays(1))
+    for(QDate date = QDate::currentDate().addDays(-20)/*m_BudgetStartDate*/; date < QDate::currentDate().addDays(20); date = date.addDays(1))
     {
         numTransactions = 4;//date.toJulianDay() % 10;
         qDebug("Date: %s\tnumTrans: %d\n",date.toString().toStdString().c_str(),numTransactions);

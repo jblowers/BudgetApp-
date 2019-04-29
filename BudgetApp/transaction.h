@@ -3,12 +3,15 @@
 
 #include <QObject>
 #include <QDate>
+#include <QJsonObject>
 
 class Transaction
 {
 public:
     Transaction();
 
+    QDate m_dateModified;
+    QDate m_dateCreated;
     QString m_strTitle;
     QString m_strDescription;
 
@@ -44,7 +47,7 @@ public:
         }
 
     }
-
+    bool SaveToJson(QJsonObject &json);
 
     QString print() { QString str = "Title: " + m_strTitle;
                     str += "\nDesc: " + m_strDescription;

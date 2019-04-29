@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QMap>
+#include <QFile>
+#include <QJsonDocument>
 #include "budget.h"
 
 class BudgetController : public QObject
@@ -31,7 +33,7 @@ public:
     void addTransaction(Transaction trans) { m_budget.addTransaction(trans); }
     QVector<Transaction*> getTransactionVector(QDate date) { return m_budget.getTransactionsAtDate(date); }
 
-
+    void saveBudgetToFile(QString strFile);
 };
 
 #endif // BUDGETCONTROLLER_H
