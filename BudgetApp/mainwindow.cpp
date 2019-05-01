@@ -3,8 +3,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    m_nCurrentTransactionIndex(0)
+    m_nCurrentTransactionIndex(0),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     m_pController = new BudgetController();
@@ -15,9 +15,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->SaveTransactionButton,SIGNAL(clicked()),this,SLOT(onSaveTransactionPressed()));
     connect(ui->RemoveSelectedButton,SIGNAL(clicked()),this,SLOT(onRemoveSelectedPressed()));
 
+    connect(ui->SaveBudgetBrowseButton,SIGNAL(clicked()), this, SLOT(onSaveBrowsePressed()));
+    connect(ui->SaveBudgetPushButton,SIGNAL(clicked()),this,SLOT(onSaveButtonPressed()));
+
+    connect(m_pController,SIGNAL(LogToGui(QString)),this,SLOT(LogToGuiWindow(QString)));
+
+    connect(this,SIGNAL(SaveBudgetToJsonFile(QString)),m_pController,SLOT(onSaveBudgetToJsonFileRequested(QString)));
+
     connect(m_pController,SIGNAL(updateTransactionGui()),this,SLOT(onSelectionChanged()));
-    m_pCal->setMinimumDate(m_pController->getStartDate());
-    m_pCal->setMaximumDate(m_pController->getEndDate());
+//    m_pCal->setMinimumDate(m_pController->getStartDate());
+//    m_pCal->setMaximumDate(m_pController->getEndDate());
 
 
 //    fillInTransactionData(nullptr);
@@ -26,6 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::LogToGuiWindow(QString logMessage)
+{
+    qDebug(logMessage.toStdString().c_str());
+    ui->LogWindowTextEdit->setText(ui->LogWindowTextEdit->toPlainText() + "\n" + logMessage);
 }
 
 void MainWindow::onSaveTransactionPressed()
@@ -143,14 +156,41 @@ void MainWindow::populateTransactionList(QVector<Transaction*> trans)
     }
 }
 
+void MainWindow::onSaveBrowsePressed()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+        tr("Save Budget to File"), "../", tr("Json Files (*.json)"));
+    ui->BudgetSaveLineEdit->setText(fileName);
+}
+
+void MainWindow::onSaveButtonPressed()
+{
+    QString fileName = ui->BudgetSaveLineEdit->text();
+    if(QFile::exists(fileName)){
+
+    } else {
+        QFile f(fileName);
+        // to create? could probably be done deeper in the budget or controller class
+        f.open(QFile::OpenModeFlag::WriteOnly);
+        f.close();
+    }
+    emit SaveBudgetToJsonFile(fileName);
+}
+
 void MainWindow::fillInTransactionData(Transaction* trans)
 {
     qDebug("fillInTransactionData %d",trans!=nullptr);
     if(trans) {
+        if ( !ui->TitleLineEdit->isEnabled()) { ui->TitleLineEdit->setEnabled(true); }
+        if ( !ui->DescriptionsTextEdit->isEnabled()) { ui->DescriptionsTextEdit->setEnabled(true); }
+        if ( !ui->ValueSpinBox->isEnabled()) { ui->ValueSpinBox->setEnabled(true); }
         ui->TitleLineEdit->setText(trans->title());
         ui->DescriptionsTextEdit->setText(trans->description());
         ui->ValueSpinBox->setValue(trans->value());
     } else {
+        if ( ui->TitleLineEdit->isEnabled()) { ui->TitleLineEdit->setEnabled(false); }
+        if ( ui->DescriptionsTextEdit->isEnabled()) { ui->DescriptionsTextEdit->setEnabled(false); }
+        if ( ui->ValueSpinBox->isEnabled()) { ui->ValueSpinBox->setEnabled(false); }
         ui->TitleLineEdit->setText("N/A");
         ui->DescriptionsTextEdit->setText("N/A");
         ui->ValueSpinBox->setValue(0);

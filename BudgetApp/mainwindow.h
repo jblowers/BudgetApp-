@@ -5,6 +5,7 @@
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QListWidget>
+#include <QFileDialog>
 #include "budgetcontroller.h"
 
 
@@ -36,7 +37,12 @@ public slots:
     void onSelectedTransIndexChanged(int);
     void onRemoveSelectedPressed();
     void onSaveTransactionPressed();
+    void onSaveBrowsePressed();
+    void onSaveButtonPressed();
+    void LogToGuiWindow(QString);
 
+signals:
+    void SaveBudgetToJsonFile(QString);
 private:
     Ui::MainWindow *ui;
 };

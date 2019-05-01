@@ -16,6 +16,7 @@ public:
 
 signals:
     void updateTransactionGui();
+    void LogToGui(QString);
 
 public:
 
@@ -25,6 +26,7 @@ public:
     QDate getEndDate() { return m_budget.getEndDate(); }
     void removeTransaction(QDate date,int nIndex);
     void removeTransaction(Transaction* pTrans) {
+        emit LogToGui("Removing Transaction" + pTrans->title());
         qDebug("removeTransaction(ptrans) %d",pTrans);
         m_budget.removeTransaction(pTrans);
         emit updateTransactionGui();
@@ -34,6 +36,9 @@ public:
     QVector<Transaction*> getTransactionVector(QDate date) { return m_budget.getTransactionsAtDate(date); }
 
     void saveBudgetToFile(QString strFile);
+
+public slots:
+    void onSaveBudgetToJsonFileRequested(QString);
 };
 
 #endif // BUDGETCONTROLLER_H

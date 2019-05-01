@@ -14,6 +14,10 @@ BudgetController::~BudgetController()
     //end
 }
 
+void BudgetController::onSaveBudgetToJsonFileRequested(QString jsonFile)
+{
+    saveBudgetToFile(jsonFile);
+}
 
 void BudgetController::removeTransaction(QDate date,int nIndex)
 {
@@ -24,7 +28,9 @@ void BudgetController::removeTransaction(QDate date,int nIndex)
 
 void BudgetController::saveBudgetToFile(QString strFile)
 {
-    strFile = "D:/John/test_budget_file.json";
+    if(strFile.isEmpty()) {
+        strFile = "D:/John/test_budget_file.json";
+    }
     QFile saveFile(strFile);
 
        if (!saveFile.open(QIODevice::WriteOnly)) {
