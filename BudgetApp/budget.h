@@ -24,10 +24,10 @@ public:
     QDate m_DateCreated;
     QDate m_DateModified; //saved?
 
+    QMap<QDate,Day*> m_DayMap;
 
     //member
     QVector<Transaction> m_TransactionData;
-    QMap<QDate,Day> m_dayMap;
     QDate m_BudgetStartDate;
     QDate m_BudgetEndDate;
     QMap<QDate,QVector<Transaction*>> m_DateMap;
@@ -42,9 +42,11 @@ public:
     QDate getEndDate() { return m_BudgetEndDate; }
 
     QVector<Transaction*> getTransactionsAtDate(QDate date) { return m_DateMap[date]; }
+    Day* getDay(QDate date) { return m_DayMap[date]; }
     void updateDateMap();
 
     bool SaveToJson(QJsonObject &json);
+    static Budget LoadFromJson(QJsonObject &json);
 
     // debug functions
 

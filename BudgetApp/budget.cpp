@@ -16,6 +16,14 @@ Budget::Budget(QObject* parent) : QObject(parent)
 //    loadDefaultBudget();
 //}
 
+Budget Budget::LoadFromJson(QJsonObject &json)
+{
+    QString title = json["budgetTitle"].toString();
+    QString desc = json["budgetDescription"].toString();
+    Budget b;
+//    b.setDateCreated(QDate::fromString(json["dateCreated"].toString())
+
+}
 
 bool Budget::SaveToJson(QJsonObject &json)
 {
@@ -124,21 +132,19 @@ void Budget::updateDateMap()
     for(int i = 0; i < m_TransactionData.length(); i++) {
         trans = m_TransactionData[i];
         m_DateMap[trans.date()].append(&m_TransactionData[i]);
+//        m_DayMap[trans.date()]->addTransaction(&m_TransactionData[i]);
     }
 
 
-    // printing date map
-    if(0) {
-        QDate date = m_BudgetStartDate.addDays(16);
-        QVector<Transaction*> vec = m_DateMap[date];
-        for(int i = 0; i < vec.length(); i++ ) {
-            qDebug("date: %s. title: %s.\ndescription: %s\nvalue: $%d",date.toString().toStdString().c_str(),
-                   vec[i]->title().toStdString().c_str(),vec[i]->description().toStdString().c_str(),vec[i]->value());
-
-        }
-
-
-    }
+//    // printing date map
+//    if(0) {
+//        QDate date = m_BudgetStartDate.addDays(16);
+//        QVector<Transaction*> vec = m_DateMap[date];
+//        for(int i = 0; i < vec.length(); i++ ) {
+//            qDebug("date: %s. title: %s.\ndescription: %s\nvalue: $%d",date.toString().toStdString().c_str(),
+//                   vec[i]->title().toStdString().c_str(),vec[i]->description().toStdString().c_str(),vec[i]->value());
+//        }
+//    }
 }
 
 

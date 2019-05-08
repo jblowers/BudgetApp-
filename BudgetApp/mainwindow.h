@@ -6,8 +6,12 @@
 #include <QComboBox>
 #include <QListWidget>
 #include <QFileDialog>
+#include <QThread>
 #include "budgetcontroller.h"
 
+
+Q_DECLARE_METATYPE(Transaction*)
+Q_DECLARE_METATYPE(QVector<Transaction*>)
 
 namespace Ui {
 class MainWindow;
@@ -16,18 +20,18 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    QThread m_ControllerThread;
     BudgetController* m_pController;
     QCalendarWidget *m_pCal;
     QComboBox *m_pCombo;
     QListWidget *m_pList;
     void fillInTransactionData(Transaction* trans);
     void populateTransactionList(QVector<Transaction*> trans);
-    void updateGuiData();
+    void updateSelectedTransaction(int nIndex);
     int m_nCurrentTransactionIndex;
 
     QVector<Transaction*> m_CurrentSelectionTransactions;
@@ -40,9 +44,14 @@ public slots:
     void onSaveBrowsePressed();
     void onSaveButtonPressed();
     void LogToGuiWindow(QString);
+    void onUpdateGuiTransactions(QVector<Transaction*>);
 
 signals:
     void SaveBudgetToJsonFile(QString);
+    void RemoveSelected();
+    void RequestSelectedDate(QDate);
+//    void
+
 private:
     Ui::MainWindow *ui;
 };
