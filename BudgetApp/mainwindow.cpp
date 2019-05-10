@@ -13,26 +13,35 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_pController = new BudgetController();
     m_pController->moveToThread(&m_ControllerThread);
+
     m_pCal = ui->calendarWidget;
     m_pList = ui->TransactionListWidget;
+    ui->BudgetSaveLineEdit->setText(DEFAULT_BUDGET_FILE);
+    // gui to mainwindow connects
     connect(m_pCal,SIGNAL(selectionChanged()),this,SLOT(onSelectionChanged()));
     connect(m_pList,SIGNAL(currentRowChanged(int)),this,SLOT(onSelectedTransIndexChanged(int)));
     connect(ui->SaveBudgetBrowseButton,SIGNAL(clicked()), this, SLOT(onSaveBrowsePressed()));
     connect(ui->SaveBudgetPushButton,SIGNAL(clicked()),this,SLOT(onSaveButtonPressed()));
-
-
     connect(ui->SaveTransactionButton,SIGNAL(clicked()),this,SLOT(onSaveTransactionPressed()));
     connect(ui->RemoveSelectedButton,SIGNAL(clicked()),this,SLOT(onRemoveSelectedPressed()));
+    connect(ui->LoadBudgetPushButton,SIGNAL(clicked()),this,SLOT(onLoadButtonPressed()));
+    connect(ui->LoadBudgetBrowseButton,SIGNAL(clicked()),this,SLOT(onLoadBrowsePressed()));
 
-
-    connect(m_pController,SIGNAL(LogToGui(QString)),this,SLOT(LogToGuiWindow(QString)));
+    // mainwindow -> controller connects
     connect(this,SIGNAL(RemoveSelected()),m_pController,SLOT(onRemoveSelected()));
-
+    connect(this,SIGNAL(SelectedTransactionChanged(int)),m_pController,SLOT(onSelectedTransactionChanged(int)));
     connect(this,SIGNAL(RequestSelectedDate(QDate)),m_pController,SLOT(onRequestTransactionsAt(QDate)));
-    connect(m_pController,SIGNAL(updateGuiTransactions(QVector<Transaction*>)),this,SLOT(onUpdateGuiTransactions(QVector<Transaction*>)));
-
     connect(this,SIGNAL(SaveBudgetToJsonFile(QString)),m_pController,SLOT(onSaveBudgetToJsonFileRequested(QString)));
+    connect(this,SIGNAL(RequestSaveTransaction(Transaction)),m_pController,SLOT(onSaveSelected(Transaction)));
+    connect(this,SIGNAL(LoadBudgetFromJsonFile(QString)),m_pController,SLOT(onLoadBudgetToJsonFileRequested(QString)));
 
+    // controller -> mainwindow connects
+    connect(m_pController,SIGNAL(LogToGui(QString)),this,SLOT(LogToGuiWindow(QString)));
+    connect(m_pController,SIGNAL(updateGuiTransactions(QVector<Transaction*>)),this,SLOT(onUpdateGuiTransactions(QVector<Transaction*>)));
+    connect(m_pController,SIGNAL(RequestUpdateGui()),this,SLOT(onControllerRequestUpdateGui()));
+
+
+    // starts controller thread to get backend working
     m_ControllerThread.start();
 }
 
@@ -56,26 +65,33 @@ void MainWindow::LogToGuiWindow(QString logMessage)
 
 void MainWindow::onSaveTransactionPressed()
 {
-    LogToGuiWindow("onSaveTransactionPressed()");
-    LogToGuiWindow("\tonSaveTransactionPressed()-> FAILED.");
+    LogToGuiWindow("MainWindow::onSaveTransactionPressed()");
+    Transaction t;
+    t.setDate(m_pCal->selectedDate());
+    t.setTitle(ui->TitleLineEdit->text());
+    t.setDescription(ui->DescriptionsTextEdit->toPlainText());
+    t.setValue(ui->ValueSpinBox->value());
+//    t.setTransactionType()
+    emit RequestSaveTransaction(t);
+//    LogToGuiWindow("\tonSaveTransactionPressed()-> FAILED.");
 }
 
 void MainWindow::onRemoveSelectedPressed()
 {
     LogToGuiWindow("onRemoveSelectedPressed()");
-    LogToGuiWindow("\tonRemoveSelectedPressed()-> FAILED.");
-
+    emit RemoveSelected();
 }
 
 
 void MainWindow::onSelectedTransIndexChanged(int index)
 {
-    qDebug("onSelectedTransIndexChanged( %d )",index);
-    LogToGuiWindow("onSelectedTransIndexChanged( " + QString::number(index) + " )");
+    qDebug("MainWindow::onSelectedTransIndexChanged( %d )",index);
+    LogToGuiWindow("MainWindow::onSelectedTransIndexChanged( " + QString::number(index) + " )");
     if(index > -1) {
         updateSelectedTransaction(index);
     }
     m_nCurrentTransactionIndex = index;
+    emit SelectedTransactionChanged(m_nCurrentTransactionIndex);
 }
 
 
@@ -140,6 +156,13 @@ void MainWindow::onSaveBrowsePressed()
     ui->BudgetSaveLineEdit->setText(fileName);
 }
 
+void MainWindow::onLoadBrowsePressed()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Load Budget from File"), "../", tr("Json Files (*.json)"));
+    ui->BudgetLoadLineEdit->setText(fileName);
+}
+
 void MainWindow::onSaveButtonPressed()
 {
     QString fileName = ui->BudgetSaveLineEdit->text();
@@ -152,6 +175,18 @@ void MainWindow::onSaveButtonPressed()
         f.close();
     }
     emit SaveBudgetToJsonFile(fileName);
+}
+
+void MainWindow::onLoadButtonPressed()
+{
+    QString fileName = ui->BudgetLoadLineEdit->text();
+    if(QFile::exists(fileName)) {
+//        QFile f(fileName);
+//        f.open(QFile::OpenModeFlag::ReadOnly);
+        emit LoadBudgetFromJsonFile(fileName);
+    } else {
+        LogToGuiWindow("Budget file doesn't exist.");
+    }
 }
 
 void MainWindow::fillInTransactionData(Transaction* trans)

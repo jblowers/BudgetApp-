@@ -43,13 +43,19 @@ public slots:
     void onSaveTransactionPressed();
     void onSaveBrowsePressed();
     void onSaveButtonPressed();
+    void onLoadButtonPressed();
+    void onLoadBrowsePressed();
     void LogToGuiWindow(QString);
     void onUpdateGuiTransactions(QVector<Transaction*>);
+    void onControllerRequestUpdateGui() { emit RequestSelectedDate(m_pCal->selectedDate()); } // new data update requested from controller
 
 signals:
     void SaveBudgetToJsonFile(QString);
+    void LoadBudgetFromJsonFile(QString);
     void RemoveSelected();
     void RequestSelectedDate(QDate);
+    void SelectedTransactionChanged(int);
+    void RequestSaveTransaction(Transaction);
 //    void
 
 private:

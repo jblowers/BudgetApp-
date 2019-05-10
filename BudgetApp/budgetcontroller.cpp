@@ -19,18 +19,21 @@ void BudgetController::onSaveBudgetToJsonFileRequested(QString jsonFile)
     saveBudgetToFile(jsonFile);
 }
 
-void BudgetController::removeTransaction(QDate date,int nIndex)
+void BudgetController::onLoadBudgetFromJsonFileRequested(QString jsonFile)
 {
-    qDebug("Attempting to remove %s index %d",date.toString().toStdString().c_str(),nIndex);
-    emit LogToGui("Attempting to remove " + date.toString());
-    m_budget.removeTransaction(date,nIndex);
+    loadBudgetFromFile(jsonFile);
 
-//    m_budget.removeTransaction(date,nIndex);
+}
+
+void BudgetController::loadBudgetFromFile(QString jsonFile)
+{
+
 
 }
 
 void BudgetController::onRequestTransactionsAt(QDate date)
 {
+    emit LogToGui("BudgetController::onRequestTransactionsAt( " + date.toString() + " )");
     auto transactions = m_budget.getTransactionsAtDate(date);
     // make copy of current day's transactions; to be edited locally in gui, then when requested, will be saved to the current budget
     m_CurrentDisplayedTransactions = copyOfTransactions(transactions);
@@ -61,26 +64,55 @@ QVector<Transaction*> BudgetController::copyOfTransactions(QVector<Transaction*>
 
 }
 
+void BudgetController::onSaveSelected(Transaction trans)
+{
+    auto transactions = m_budget.getTransactionsAtDate(trans.date());
+//    transactions[m_nCurrentSelectedIndex]-> // need to search for already existing transaction and replace with new one...
+
+}
+
 void BudgetController::onRemoveSelected()
 {
-    removeTransaction(QDate::currentDate(),0);
+    emit LogToGui("\tBudgetController::onRemoveSelected()");
+    if(m_nCurrentSelectedIndex != -1) {
+        QDate date = m_CurrentDisplayedTransactions[m_nCurrentSelectedIndex]->date();
+        removeTransaction(date,m_nCurrentSelectedIndex);
+    } else {
+        emit LogToGui("Invalid selected index, could not remove.");
+    }
+}
+
+void BudgetController::removeTransaction(QDate date,int nIndex)
+{
+    emit LogToGui("BudgetController::removeTransaction( " + date.toString() + ", " + QString::number(nIndex) + " )");
+    qDebug("Attempting to remove %s index %d",date.toString().toStdString().c_str(),nIndex);
+    m_budget.removeTransaction(date,nIndex);
+    emit RequestUpdateGui();
+}
+
+void BudgetController::onSelectedTransactionChanged(int nIndex)
+{
+    emit LogToGui("BudgetController::onSelectedTransactionChanged( " + QString::number(nIndex) + " )");
+    m_nCurrentSelectedIndex = nIndex;
 }
 
 void BudgetController::saveBudgetToFile(QString strFile)
 {
+    emit LogToGui("\tBudgetController::saveBudgetToFile( " + strFile + " )");
     if(strFile.isEmpty()) {
-        strFile = "D:/John/test_budget_file.json";
+        strFile = DEFAULT_BUDGET_FILE;
     }
     QFile saveFile(strFile);
 
-       if (!saveFile.open(QIODevice::WriteOnly)) {
-           qWarning("Couldn't open save file.");
-       }
+    if (!saveFile.open(QIODevice::WriteOnly)) {
+       qWarning("Couldn't open save file.");
+       emit LogToGui("Couldn't open save file: " + strFile);
+       return;
+    }
 
-       QJsonObject budgetObject;
-       m_budget.SaveToJson(budgetObject);
-       QJsonDocument saveDoc(budgetObject);
-       saveFile.write(saveDoc.toJson());
-
-
+    QJsonObject budgetObject;
+    m_budget.SaveToJson(budgetObject);
+    QJsonDocument saveDoc(budgetObject);
+    saveFile.write(saveDoc.toJson());
+    saveFile.close();
 }

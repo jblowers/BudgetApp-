@@ -7,6 +7,8 @@
 #include <QJsonDocument>
 #include "budget.h"
 
+#define DEFAULT_BUDGET_FILE "D:/John/test_budget_file.json"
+
 class BudgetController : public QObject
 {
     Q_OBJECT
@@ -18,11 +20,13 @@ signals:
     void updateTransactionGui();
     void LogToGui(QString);
     void updateGuiTransactions(QVector<Transaction*>);
+    void RequestUpdateGui();
 
 public:
 
     Budget m_budget;
     QVector<Transaction*> m_CurrentDisplayedTransactions;
+    int m_nCurrentSelectedIndex = -1;
 
     QVector<Transaction*> copyOfTransactions(QVector<Transaction*> transactions);
 
@@ -40,11 +44,15 @@ public:
     QVector<Transaction*> getTransactionVector(QDate date) { return m_budget.getTransactionsAtDate(date); }
 
     void saveBudgetToFile(QString strFile);
+    void loadBudgetFromFile(QString jsonFile);
 
 public slots:
     void onSaveBudgetToJsonFileRequested(QString);
+    void onLoadBudgetFromJsonFileRequested(QString);
     void onRemoveSelected();
     void onRequestTransactionsAt(QDate);
+    void onSelectedTransactionChanged(int);
+    void onSaveSelected(Transaction);
 };
 
 #endif // BUDGETCONTROLLER_H
