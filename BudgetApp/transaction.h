@@ -25,6 +25,14 @@ public:
     TransactionType m_type;
     double m_value;
 
+
+#define STR_INCOME "Income"
+#define STR_EXPENSE "Expense"
+#define STR_UNKNOWN "Unknown"
+
+    void setDateModified(QDate date) { m_dateModified = date; }
+    void setDateCreated(QDate date) { m_dateCreated = date; }
+
     QDate date() { return m_date; }
     void setDate(QDate date) { m_date = date; }
     QString title() { return m_strTitle; }
@@ -35,6 +43,17 @@ public:
     void setTransactionType(TransactionType type) { m_type = type; }
     double value() { return m_value; }
     void setValue(double val) { m_value = val; }
+    TransactionType getTypeFromString(QString str) {
+        if(str == STR_INCOME) {
+            return Transaction_Income;
+        }
+        if(str == STR_EXPENSE) {
+            return Transaction_Expense;
+        }
+//        if ( str == STR_UNKNOWN) {
+            return Transaction_Unknown;
+//        }
+    }
     QString getTypeAsString() {
         switch(m_type) {
         case Transaction_Income:
@@ -48,6 +67,7 @@ public:
 
     }
     bool SaveToJson(QJsonObject &json);
+    bool LoadFromJson(QJsonObject json);
 
     QString print() { QString str = "Title: " + m_strTitle;
                     str += "\nDesc: " + m_strDescription;

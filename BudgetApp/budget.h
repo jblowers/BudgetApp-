@@ -24,6 +24,13 @@ public:
     QDate m_DateCreated;
     QDate m_DateModified; //saved?
 
+    void setTitle(QString title) { m_Title = title; }
+    void setDescription(QString desc) { m_Description = desc; }
+    void setStartDate(QDate date) { m_BudgetStartDate = date; }
+    void setEndDate(QDate date) { m_BudgetEndDate = date; }
+    void setCreatedDate(QDate date) { m_DateCreated = date; }
+    void setModifiedDate(QDate date) { m_DateModified = date; }
+
     QMap<QDate,Day*> m_DayMap;
 
     //member
@@ -46,7 +53,7 @@ public:
     void updateDateMap();
 
     bool SaveToJson(QJsonObject &json);
-    static Budget LoadFromJson(QJsonObject &json);
+    static Budget* LoadFromJson(QJsonObject &json);
 
     // debug functions
 

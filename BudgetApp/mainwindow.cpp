@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this,SIGNAL(RequestSelectedDate(QDate)),m_pController,SLOT(onRequestTransactionsAt(QDate)));
     connect(this,SIGNAL(SaveBudgetToJsonFile(QString)),m_pController,SLOT(onSaveBudgetToJsonFileRequested(QString)));
     connect(this,SIGNAL(RequestSaveTransaction(Transaction)),m_pController,SLOT(onSaveSelected(Transaction)));
-    connect(this,SIGNAL(LoadBudgetFromJsonFile(QString)),m_pController,SLOT(onLoadBudgetToJsonFileRequested(QString)));
+    connect(this,SIGNAL(LoadBudgetFromJsonFile(QString)),m_pController,SLOT(onLoadBudgetFromJsonFileRequested(QString)));
 
     // controller -> mainwindow connects
     connect(m_pController,SIGNAL(LogToGui(QString)),this,SLOT(LogToGuiWindow(QString)));
@@ -181,8 +181,6 @@ void MainWindow::onLoadButtonPressed()
 {
     QString fileName = ui->BudgetLoadLineEdit->text();
     if(QFile::exists(fileName)) {
-//        QFile f(fileName);
-//        f.open(QFile::OpenModeFlag::ReadOnly);
         emit LoadBudgetFromJsonFile(fileName);
     } else {
         LogToGuiWindow("Budget file doesn't exist.");

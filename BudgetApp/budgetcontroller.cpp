@@ -6,7 +6,7 @@ BudgetController::BudgetController(QObject* parent) :
 {
 
 //    m_budget.loadDefaultBudget();
-    saveBudgetToFile("");
+//    saveBudgetToFile("");
 }
 
 BudgetController::~BudgetController()
@@ -21,13 +21,32 @@ void BudgetController::onSaveBudgetToJsonFileRequested(QString jsonFile)
 
 void BudgetController::onLoadBudgetFromJsonFileRequested(QString jsonFile)
 {
+    emit LogToGui("BudgetController::onLoadBudgetFromJsonFileRequested( " + jsonFile + " )");
     loadBudgetFromFile(jsonFile);
 
 }
 
-void BudgetController::loadBudgetFromFile(QString jsonFile)
+void BudgetController::loadBudgetFromFile(QString strFile)
 {
 
+    emit LogToGui("\tBudgetController::loadBudgetFromFile( " + strFile + " )");
+//    if(strFile.isEmpty()) {
+//        strFile = DEFAULT_BUDGET_FILE;
+//    }
+    QFile loadFile(strFile);
+
+    if (!loadFile.open(QIODevice::ReadOnly)) {
+       qWarning("Couldn't open load file.");
+       emit LogToGui("Couldn't open load file: " + strFile);
+       return;
+    }
+    QByteArray byteArr = loadFile.readAll();
+    QJsonDocument doc;
+    doc.fromJson(byteArr);
+//    doc.fromBinaryData(byteArr);
+
+    QJsonObject jsonObj = doc.object();
+    m_budget.LoadFromJson(jsonObj);
 
 }
 
@@ -114,5 +133,5 @@ void BudgetController::saveBudgetToFile(QString strFile)
     m_budget.SaveToJson(budgetObject);
     QJsonDocument saveDoc(budgetObject);
     saveFile.write(saveDoc.toJson());
-    saveFile.close();
+//    saveFile.close();
 }

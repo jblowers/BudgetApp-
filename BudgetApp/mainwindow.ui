@@ -198,7 +198,7 @@
       <item>
        <widget class="QLineEdit" name="BudgetSaveLineEdit">
         <property name="text">
-         <string>D:/John/Personal/Test_Budget_x.json</string>
+         <string>D:/John/test_budget_file.json</string>
         </property>
        </widget>
       </item>
@@ -255,7 +255,7 @@
       <item>
        <widget class="QLineEdit" name="BudgetLoadLineEdit">
         <property name="text">
-         <string>D:/John/Personal/Test_Budget_x.json</string>
+         <string>D:/John/test_budget_file.json</string>
         </property>
        </widget>
       </item>

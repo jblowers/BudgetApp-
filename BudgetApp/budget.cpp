@@ -4,7 +4,7 @@
 Budget::Budget(QObject* parent) : QObject(parent)
 {
 
-    loadDefaultBudget();
+//    loadDefaultBudget();
 
 }
 
@@ -16,13 +16,51 @@ Budget::Budget(QObject* parent) : QObject(parent)
 //    loadDefaultBudget();
 //}
 
-Budget Budget::LoadFromJson(QJsonObject &json)
+Budget* Budget::LoadFromJson(QJsonObject &json)
 {
     QString title = json["budgetTitle"].toString();
     QString desc = json["budgetDescription"].toString();
-    Budget b;
-//    b.setDateCreated(QDate::fromString(json["dateCreated"].toString())
+    Budget* b = new Budget();
+    QJsonValue val;
 
+    val = json["budgetTitle"];
+    if( val != QJsonValue::Undefined)
+        b->setTitle(val.toString());
+
+    val = json["budgetDescription"];
+    if( val != QJsonValue::Undefined) {
+        b->setDescription(val.toString());
+    }
+    val = json["budgetStartDate"];
+    if( val != QJsonValue::Undefined){
+        b->setStartDate(QDate::fromString(val.toString()));
+    }
+    val = json["budgetEndDate"];
+    if( val != QJsonValue::Undefined){
+        b->setEndDate(QDate::fromString(val.toString()));
+    }
+    val = json["dateCreated"];
+    if( val != QJsonValue::Undefined){
+        b->setCreatedDate(QDate::fromString(val.toString()));
+    }
+    val = json["dateModified"];
+    if( val != QJsonValue::Undefined){
+        b->setModifiedDate(QDate::fromString(val.toString()));
+    }
+
+    val = json["transactionArray"];
+    if ( val != QJsonValue::Undefined) {
+        auto arr = val.toArray();
+        QJsonObject transObject;
+        foreach(auto trans,arr){
+            transObject = trans.toObject();
+            Transaction t;
+            if( t.LoadFromJson(trans.toObject()) ) {
+                b->addTransaction(t);
+            }
+        }
+    }
+    return b;
 }
 
 bool Budget::SaveToJson(QJsonObject &json)
@@ -40,7 +78,7 @@ bool Budget::SaveToJson(QJsonObject &json)
         trans.SaveToJson(transObj);
         transArray.append(transObj);
     }
-    json["transactionDate"] = transArray;
+    json["transactionArray"] = transArray;
 
     return true;
 }
