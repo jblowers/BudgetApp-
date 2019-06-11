@@ -11,6 +11,15 @@
 #include "transaction.h"
 
 
+// to make loading/saving consistent
+#define JSON_TITLE "budgetTitle"
+#define JSON_STARTDATE "budgetStartDate"
+#define JSON_ENDDATE "budgetEndDate"
+#define JSON_DESC "budgetDescription"
+#define JSON_DATEMODIFIED "dateModified"
+#define JSON_DATECREATED "dateCreated"
+#define JSON_TRANSACTIONARRAY "transactionArray"
+
 class Budget : public QObject
 {
     Q_OBJECT
@@ -53,7 +62,7 @@ public:
     void updateDateMap();
 
     bool SaveToJson(QJsonObject &json);
-    static Budget* LoadFromJson(QJsonObject &json);
+    /*static*/ Budget* LoadFromJson(QJsonObject &json);
 
     // debug functions
 

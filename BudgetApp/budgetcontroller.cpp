@@ -41,11 +41,11 @@ void BudgetController::loadBudgetFromFile(QString strFile)
        return;
     }
     QByteArray byteArr = loadFile.readAll();
-    QJsonDocument doc;
-    doc.fromJson(byteArr);
+    QJsonDocument doc = QJsonDocument::fromJson(byteArr);
 //    doc.fromBinaryData(byteArr);
 
     QJsonObject jsonObj = doc.object();
+//    Budget b(m_budget.LoadFromJson(jsonObj));
     m_budget.LoadFromJson(jsonObj);
 
 }

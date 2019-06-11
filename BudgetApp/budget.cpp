@@ -1,5 +1,7 @@
 #include "budget.h"
 
+
+
 //Budget::Budget()
 Budget::Budget(QObject* parent) : QObject(parent)
 {
@@ -18,37 +20,37 @@ Budget::Budget(QObject* parent) : QObject(parent)
 
 Budget* Budget::LoadFromJson(QJsonObject &json)
 {
-    QString title = json["budgetTitle"].toString();
-    QString desc = json["budgetDescription"].toString();
-    Budget* b = new Budget();
+    QString title = json[JSON_TITLE].toString();
+    QString desc = json[JSON_DESC].toString();
+    Budget* b = this;/*new Budget();*/
     QJsonValue val;
 
-    val = json["budgetTitle"];
+    val = json[JSON_TITLE];
     if( val != QJsonValue::Undefined)
         b->setTitle(val.toString());
 
-    val = json["budgetDescription"];
+    val = json[JSON_DESC];
     if( val != QJsonValue::Undefined) {
         b->setDescription(val.toString());
     }
-    val = json["budgetStartDate"];
+    val = json[JSON_STARTDATE];
     if( val != QJsonValue::Undefined){
         b->setStartDate(QDate::fromString(val.toString()));
     }
-    val = json["budgetEndDate"];
+    val = json[JSON_ENDDATE];
     if( val != QJsonValue::Undefined){
         b->setEndDate(QDate::fromString(val.toString()));
     }
-    val = json["dateCreated"];
+    val = json[JSON_DATECREATED];
     if( val != QJsonValue::Undefined){
         b->setCreatedDate(QDate::fromString(val.toString()));
     }
-    val = json["dateModified"];
+    val = json[JSON_DATEMODIFIED];
     if( val != QJsonValue::Undefined){
         b->setModifiedDate(QDate::fromString(val.toString()));
     }
 
-    val = json["transactionArray"];
+    val = json[JSON_TRANSACTIONARRAY];
     if ( val != QJsonValue::Undefined) {
         auto arr = val.toArray();
         QJsonObject transObject;
@@ -65,12 +67,12 @@ Budget* Budget::LoadFromJson(QJsonObject &json)
 
 bool Budget::SaveToJson(QJsonObject &json)
 {
-    json["budgetTitle"] = "Test Budget";
-    json["budgetDescription"] = "Test test 123Abc";
-    json["dateCreated"] = m_DateCreated.toString();
-    json["dateModified"] = m_DateModified.toString();
-    json["budgetStartDate"] = m_BudgetStartDate.toString();
-    json["budgetEndDate"] = m_BudgetEndDate.toString();
+    json[JSON_TITLE] = "Test Budget";
+    json[JSON_DESC] = "Test test 123Abc";
+    json[JSON_DATECREATED] = m_DateCreated.toString();
+    json[JSON_DATEMODIFIED] = m_DateModified.toString();
+    json[JSON_STARTDATE] = m_BudgetStartDate.toString();
+    json[JSON_ENDDATE] = m_BudgetEndDate.toString();
     QJsonArray transArray;
     foreach(Transaction trans,m_TransactionData)
     {
@@ -78,7 +80,7 @@ bool Budget::SaveToJson(QJsonObject &json)
         trans.SaveToJson(transObj);
         transArray.append(transObj);
     }
-    json["transactionArray"] = transArray;
+    json[JSON_TRANSACTIONARRAY] = transArray;
 
     return true;
 }
