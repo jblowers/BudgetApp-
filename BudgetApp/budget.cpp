@@ -93,6 +93,7 @@ void Budget::addTransaction(Transaction trans, bool bCheckDuplicate)
         QVector<Transaction*> vec = m_DateMap[trans.date()];
         int len = vec.length();
         for(int i = 0; i < len; i++) {
+            // brittle comparison
             if ( trans.title() == vec[i]->title() && trans.value() == vec[i]->value() && trans.description() == vec[i]->description()){
                 bDuplicate = true;
             }

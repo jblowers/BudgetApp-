@@ -95,6 +95,7 @@ void BudgetController::onSaveSelected(Transaction trans)
     QVector<Transaction*> transactions = m_budget.getTransactionsAtDate(trans.date());
 
 //    transactions[m_nCurrentSelectedIndex]-> // need to search for already existing transaction and replace with new one...
+    m_budget.addTransaction(trans);
 
 }
 

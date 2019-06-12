@@ -30,14 +30,16 @@ SOURCES += \
     budgetcontroller.cpp \
     transaction.cpp \
     budget.cpp \
-    day.cpp
+    day.cpp \
+    budgetcalendarwidget.cpp
 
 HEADERS += \
         mainwindow.h \
     budgetcontroller.h \
     transaction.h \
     budget.h \
-    day.h
+    day.h \
+    budgetcalendarwidget.h
 
 FORMS += \
         mainwindow.ui \

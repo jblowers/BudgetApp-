@@ -40,7 +40,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_pController,SIGNAL(updateGuiTransactions(QVector<Transaction*>)),this,SLOT(onUpdateGuiTransactions(QVector<Transaction*>)));
     connect(m_pController,SIGNAL(RequestUpdateGui()),this,SLOT(onControllerRequestUpdateGui()));
 
-
     // starts controller thread to get backend working
     m_ControllerThread.start();
 }
