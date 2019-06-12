@@ -89,6 +89,17 @@ void Budget::addTransaction(Transaction trans, bool bCheckDuplicate)
 {
     if (bCheckDuplicate) {
         // do logic to find if this transaction exists already or not
+        bool bDuplicate = false;
+        QVector<Transaction*> vec = m_DateMap[trans.date()];
+        int len = vec.length();
+        for(int i = 0; i < len; i++) {
+            if ( trans.title() == vec[i]->title() && trans.value() == vec[i]->value() && trans.description() == vec[i]->description()){
+                bDuplicate = true;
+            }
+        }
+        if (!bDuplicate) {
+            m_TransactionData.append(trans);
+        }
     } else {
         m_TransactionData.append(trans);
     }

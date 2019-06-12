@@ -92,10 +92,11 @@ void BudgetController::onSaveSelected(Transaction trans)
     //      Search budget transactions until a matching transaction, delete/update the match and make sure this info is emitted to the gui thread
     //          What can define a 'match'? Same title, description, and type?
     //          If so, How will I change titles, description, etc?
-    QVector<Transaction*> transactions = m_budget.getTransactionsAtDate(trans.date());
-
+    QVector<Transaction*> transactions = m_budget.getTransactionsAtDate(trans.date());            
+            
 //    transactions[m_nCurrentSelectedIndex]-> // need to search for already existing transaction and replace with new one...
-
+    m_budget.addTransaction(trans);
+    
 }
 
 void BudgetController::onRemoveSelected()
